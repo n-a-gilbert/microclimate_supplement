@@ -6,18 +6,37 @@ setwd(here::here("data"))
 
 load("microclimate_macroclimate_comparison_v01.RData")
 
-head(d)
+# site - bog name
+# btn - iButton ID
+# date
+# date_id = 1 = first date of sampling
+# scope = canopy cover
+# relev = relative elevation
+# pdecidious = proportion decidiuos trees
+# btnht = ibutton height
+# btnaspect = ibutton aspect
+# tmin = ibutton - Daymet daily min temp
+# tmax = ibutton - Daymet daily max temp
+# tmean = ibutton - Daymet daily mean temp
+# trange = ibutton -Daymet daily temp range
+
+# predictor variables are already scaled
+glimpse(d)
 
 tmin <- gamm(
   formula = tmin ~
-    s(date_scale, k = 10) +
+    s(date_id, k = 10) +
     s(scope, k = 5) +
     s(relev, k = 5) +
     s(pDeciduous, k = 5) +
     s(site, bs = "re") +
-    ti(date_scale, scope) +
-    ti(date_scale, relev) + 
-    ti(date_scale, pDeciduous),
+    s(btnHt, k = 5) + 
+    s(btnAspect, bs = "cc", k = 10) +
+    ti(date_id, scope) +
+    ti(date_id, relev) + 
+    ti(date_id, pDeciduous) + 
+    ti(date_id, btnHt) + 
+    ti(date_id, btnAspect),
   data = d, 
   family = gaussian,
   correlation = corARMA(form = ~ date_id | btn, p = 1),
@@ -26,14 +45,18 @@ tmin <- gamm(
 
 tmean <- gamm(
   formula = tmean ~
-    s(date_scale, k = 10) +
+    s(date_id, k = 10) +
     s(scope, k = 5) +
     s(relev, k = 5) +
     s(pDeciduous, k = 5) +
     s(site, bs = "re") +
-    ti(date_scale, scope) +
-    ti(date_scale, relev) + 
-    ti(date_scale, pDeciduous),
+    s(btnHt, k = 5) + 
+    s(btnAspect, bs = "cc", k = 10) +
+    ti(date_id, scope) +
+    ti(date_id, relev) + 
+    ti(date_id, pDeciduous) + 
+    ti(date_id, btnHt) + 
+    ti(date_id, btnAspect),
   data = d, 
   family = gaussian,
   correlation = corARMA(form = ~ date_id | btn, p = 1),
@@ -42,14 +65,18 @@ tmean <- gamm(
 
 tmax <- gamm(
   formula = tmax ~
-    s(date_scale, k = 10) +
+    s(date_id, k = 10) +
     s(scope, k = 5) +
     s(relev, k = 5) +
     s(pDeciduous, k = 5) +
     s(site, bs = "re") +
-    ti(date_scale, scope) +
-    ti(date_scale, relev) + 
-    ti(date_scale, pDeciduous),
+    s(btnHt, k = 5) + 
+    s(btnAspect, bs = "cc", k = 10) +
+    ti(date_id, scope) +
+    ti(date_id, relev) + 
+    ti(date_id, pDeciduous) + 
+    ti(date_id, btnHt) + 
+    ti(date_id, btnAspect),
   data = d, 
   family = gaussian,
   correlation = corARMA(form = ~ date_id | btn, p = 1),
@@ -58,18 +85,20 @@ tmax <- gamm(
 
 trange <- gamm(
   formula = trange ~
-    s(date_scale, k = 10) +
+    s(date_id, k = 10) +
     s(scope, k = 5) +
     s(relev, k = 5) +
     s(pDeciduous, k = 5) +
     s(site, bs = "re") +
-    ti(date_scale, scope) +
-    ti(date_scale, relev) + 
-    ti(date_scale, pDeciduous),
+    s(btnHt, k = 5) + 
+    s(btnAspect, bs = "cc", k = 10) +
+    ti(date_id, scope) +
+    ti(date_id, relev) + 
+    ti(date_id, pDeciduous) + 
+    ti(date_id, btnHt) + 
+    ti(date_id, btnAspect),
   data = d, 
   family = gaussian,
   correlation = corARMA(form = ~ date_id | btn, p = 1),
   method = "REML"
 )
-# setwd(here::here("results"))
-# save(tmin, tmean, tmax, trange, file = "difference_gam_v02.RData")

@@ -4,80 +4,105 @@ library(tidyverse)
 
 setwd(here::here("data"))
 
-load("boreal_microclimate_data_v01.RData")
+load("microclimate_data_v01.RData")
 
-head(d)
+d <- microclimate_data
 
-start <- Sys.time()
+# site - bog name
+# btn - iButton ID
+# date
+# date_id = 1 = first date of sampling
+# xcoord = longitude of ibutton
+# ycoord = latitude of ibutton
+# tmin = ibutton daily minimum temp
+# tmax = ibutton daily max temp
+# tmean = ibutton daily mean temp
+# trange = ibutton daily temp range
+# scope = canopy cover
+# relev = relative elevation
+# pdecidious = proportion decidiuos trees
+# btnht = ibutton height
+#btnaspect = ibutton aspect
+# predictor variables are already scaled
+glimpse(d)
 
-tminAR20 <- gamm(
+# these models take a pretty long time to run, be aware
+tminAR <- gamm(
   formula = tmin ~
-    s(date_scale, k = 20) +
+    s(date_id, k = 20) +
     s(scope, k = 5) +
     s(relev, k = 5) +
     s(pDeciduous, k = 5) +
     s(site, bs = "re") +
-    ti(date_scale, scope) +
-    ti(date_scale, relev) +
-    ti(date_scale, pDeciduous),
+    s(btnHt, k = 5) + 
+    s(btnAspect, bs = "cc", k = 10) + 
+    ti(date_id, scope) +
+    ti(date_id, relev) +
+    ti(date_id, pDeciduous) + 
+    ti(date_id, btnHt) + 
+    ti(date_id, btnAspect),
   data = d,
   family = gaussian,
   correlation = corARMA(form = ~ date_id | btn, p = 1),
   method = "REML"
 )
 
-
-tmeanAR20 <- gamm(
+tmeanAR <- gamm(
   formula = tmean ~
-    s(date_scale, k = 20) +
+    s(date_id, k = 20) +
     s(scope, k = 5) +
     s(relev, k = 5) +
     s(pDeciduous, k = 5) +
     s(site, bs = "re") +
-    ti(date_scale, scope) +
-    ti(date_scale, relev) +
-    ti(date_scale, pDeciduous),
+    s(btnHt, k = 5) + 
+    s(btnAspect, bs = "cc", k = 10) + 
+    ti(date_id, scope) +
+    ti(date_id, relev) +
+    ti(date_id, pDeciduous) + 
+    ti(date_id, btnHt) + 
+    ti(date_id, btnAspect),
   data = d,
   family = gaussian,
   correlation = corARMA(form = ~ date_id | btn, p = 1),
   method = "REML"
 )
 
-tmaxAR20 <- gamm(
+tmaxAR <- gamm(
   formula = tmax ~
-    s(date_scale, k = 20) +
+    s(date_id, k = 20) +
     s(scope, k = 5) +
     s(relev, k = 5) +
     s(pDeciduous, k = 5) +
     s(site, bs = "re") +
-    ti(date_scale, scope) +
-    ti(date_scale, relev) +
-    ti(date_scale, pDeciduous),
+    s(btnHt, k = 5) + 
+    s(btnAspect, bs = "cc", k = 10) + 
+    ti(date_id, scope) +
+    ti(date_id, relev) +
+    ti(date_id, pDeciduous) + 
+    ti(date_id, btnHt) + 
+    ti(date_id, btnAspect),
   data = d,
   family = gaussian,
   correlation = corARMA(form = ~ date_id | btn, p = 1),
   method = "REML"
 )
 
-trangeAR20 <- gamm(
+trangeAR <- gamm(
   formula = trange ~
-    s(date_scale, k = 20) +
+    s(date_id, k = 20) +
     s(scope, k = 5) +
     s(relev, k = 5) +
     s(pDeciduous, k = 5) +
     s(site, bs = "re") +
-    ti(date_scale, scope) +
-    ti(date_scale, relev) +
-    ti(date_scale, pDeciduous),
+    s(btnHt, k = 5) + 
+    s(btnAspect, bs = "cc", k = 10) + 
+    ti(date_id, scope) +
+    ti(date_id, relev) +
+    ti(date_id, pDeciduous) + 
+    ti(date_id, btnHt) + 
+    ti(date_id, btnAspect),
   data = d,
   family = gaussian,
   correlation = corARMA(form = ~ date_id | btn, p = 1),
   method = "REML"
 )
-
-setwd(here::here("results"))
-# save(tminAR20, tmeanAR20, tmaxAR20, trangeAR20,
-     # file = "ecological_gam_v05.RData")
-
-end <- Sys.time()
-end - start
